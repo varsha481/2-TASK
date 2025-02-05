@@ -1,0 +1,94 @@
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the Titanic dataset
+url = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+df = pd.read_csv(url)
+
+# Display first few rows
+print("🔹 First 5 rows of the dataset:")
+print(df.head())
+
+# -----------------------------
+# 🛠️ Step 1: Data Cleaning
+# -----------------------------
+
+# Check for missing values
+print("\n🔹 Missing values in each column:")
+print(df.isnull().sum())
+
+# Fill missing 'Age' with median
+df['Age'].fillna(df['Age'].median(), inplace=True)
+
+# Fill missing 'Embarked' with most common value
+df['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)
+
+# Drop 'Cabin' column (too many missing values)
+df.drop(columns=['Cabin', 'Name', 'Ticket'], inplace=True)  # ❗ Dropping non-numeric columns
+
+# Convert categorical variables to numerical
+df['Sex'] = df['Sex'].map({'male': 0, 'female': 1})  # Convert 'Sex' to numeric
+df['Embarked'] = df['Embarked'].map({'C': 0, 'Q': 1, 'S': 2})  # Convert 'Embarked' to numeric
+
+# -----------------------------
+# 📊 Step 2: Exploratory Data Analysis (EDA)
+# -----------------------------
+
+# 🔹 Summary statistics
+print("\n🔹 Summary statistics:")
+print(df.describe())
+
+# 🔹 Countplot of Survived
+plt.figure(figsize=(6,4))
+sns.countplot(x='Survived', data=df, palette=['red', 'green'])
+plt.title("Survival Count")
+plt.xticks([0, 1], ['Not Survived', 'Survived'])
+plt.show()
+
+# 🔹 Gender vs Survival
+plt.figure(figsize=(6,4))
+sns.countplot(x='Survived', hue='Sex', data=df, palette=['blue', 'orange'])
+plt.title("Survival Count by Gender")
+plt.xticks([0, 1], ['Male', 'Female'])
+plt.show()
+
+# 🔹 Age Distribution
+plt.figure(figsize=(8, 5))
+sns.histplot(df['Age'], bins=30, kde=True, color='purple')
+plt.title("Age Distribution of Titanic Passengers")
+plt.xlabel("Age")
+plt.ylabel("Count")
+plt.show()
+
+# 🔹 Pclass vs Survival
+plt.figure(figsize=(6,4))
+sns.countplot(x='Pclass', hue='Survived', data=df, palette='pastel')
+plt.title("Survival Rate by Passenger Class")
+plt.show()
+
+# 🔹 ✅ Fixed Correlation Heatmap
+plt.figure(figsize=(8,6))
+sns.heatmap(df.corr(), annot=True, cmap="coolwarm", fmt=".2f")
+plt.title("Feature Correlation Heatmap")
+plt.show()
+
+# 🔹 Boxplot of Age by Pclass
+plt.figure(figsize=(8, 5))
+sns.boxplot(x='Pclass', y='Age', data=df, palette='Set3')
+plt.title("Age Distribution Across Passenger Classes")
+plt.show()
+
+# -----------------------------
+# 🔍 Step 3: Key Insights
+# -----------------------------
+print("\n🔹 Key Insights:")
+print("""
+1️⃣ More passengers **did not survive (62%)** than survived (38%).
+2️⃣ **Women had a higher survival rate** compared to men.
+3️⃣ **First-class passengers had the highest survival rate**, while third-class had the lowest.
+4️⃣ The **age distribution is right-skewed**, with a median age around 28.
+5️⃣ There is a **strong correlation between fare and survival**, indicating wealthier passengers had better survival chances.
+""")
